@@ -1,0 +1,25 @@
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 100
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 1000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 10000
+CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 10000
+
