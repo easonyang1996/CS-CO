@@ -8,7 +8,7 @@ MICCAI2021 Paper: [Self-supervised visual representation learning for histopatho
 # Instructions
 We provide detailed step-by-step instructions for reproducing experiments of the proposed method on NCT-CRC-HE-100K. You can also run the proposed method on your own dataset in a similar way.
 
-**1. ** Prepare the dataset.
+**1. Prepare the dataset**
 
 Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). In our paper, NCT-CRC-HE-100K.zip is used as the training set and CRC-VAL-HE-7K.zip is used as the test set. For each set, we exclude images belonging to "BACK" class and move the rest images to one folder. 
 
@@ -32,7 +32,7 @@ Then, please go to `./data_preprocess/` and do stain separation on training and 
 python3 H_H_prime_generate.py
 ```
 
-**2. ** Training.
+**2. Training**
 
 The training of the proposed CS-CO contains two stages. Please go to `./train/`
 
@@ -51,7 +51,7 @@ CUDA_VISIBLE_DEVICES=0,1,2 python3 -u 4_csco_train_dist.py configs/NCT_CRC/cs-co
 You can also reproduce competing methods by running `run_byol_simsiam.sh` or `run_chen_xie.sh`. The configurations of all methods are saved in `./train/config/`, and you can modify them as you wish.
 
 
-**3. ** Evaluation.
+**3. Evaluation**
 
 For evaluation, we run 10 times Monte Carlo cross-validation under the linear evaluation protocol. Please go to `./linear_eval/` and run:
 
