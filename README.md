@@ -10,8 +10,27 @@ We provide detailed step-by-step instructions for reproducing experiments of the
 
 **Step 1** Prepare the dataset.
 
-Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). NCT-CRC-HE-100K.zip is used as the training set and CRC-VAL-HE-7K.zip is used as the test set. As mentioned in our paper, we excloud images belonging to "BACK" class for training and testing. 
+Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). In our paper, NCT-CRC-HE-100K.zip is used as the training set and CRC-VAL-HE-7K.zip is used as the test set. For each set, we exclude images belonging to "BACK" class and move the rest images to one folder. 
 
+```
+____NCT-CRC
+    |____train
+         |____patches
+              |____aaa.png
+              |____bbb.png
+              |____ccc.png
+    |____test
+         |____patches
+              |____ddd.png
+              |____eee.png
+              |____fff.png
+```
+
+Then, please do stain separation on training and test set separately.
+
+```
+python ./data_preprocess/H_H_prime_generate.py
+```
 
 **Step 2** Train the model.
 
