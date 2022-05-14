@@ -9,7 +9,8 @@ MICCAI2021 Paper: [Self-supervised visual representation learning for histopatho
 We provide detailed step-by-step instructions for reproducing experiments of the proposed method on NCT-CRC-HE-100K. You can also run the proposed method on your own dataset in a similar way.
 
 **Step 1** Prepare the dataset.
-Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). NCT-CRC-HE-100K.zip is used as training set and CRC-VAL-HE-7K.zip is used as test set. As mentioned in our paper, we drop images belonging to "BACK" class.
+
+Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). NCT-CRC-HE-100K.zip is used as the training set and CRC-VAL-HE-7K.zip is used as the test set. As mentioned in our paper, we excloud images belonging to "BACK" class for training and testing. 
 
 
 **Step 2** Train the model.
