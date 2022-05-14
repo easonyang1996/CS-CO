@@ -24,21 +24,22 @@ import timm
 
 from utils import EarlyStopping
 from dataset import get_training_set, get_validating_set, get_testing_set
+from resnetv2 import ResNetV2
 
 import sys
 sys.path.append('..')
 from model import Linear, Simsiam, Byol, Cs_co, Chen_mia, Xie_miccai 
 
+os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
 
-#TRAIN_DATA = '../BioImage_2015_data/dataset/train/'
-#TEST_DATA = '../BioImage_2015_data/dataset/init_test/'
-TRAIN_DATA = '../../NCT_CRC_data/all_data/train/'
-TEST_DATA = '../../NCT_CRC_data/all_data/test/'
 
-def get_img_list(path, k=None):
+TRAIN_DATA = '/data/user/yangpengshuai/MedIA_SI_datasets/NCT_CRC/train/'
+TEST_DATA = '/data/user/yangpengshuai/MedIA_SI_datasets/NCT_CRC/test/'
+
+def get_img_list(path, k=None, rand_seed=8):
     total_list = os.listdir(path)
     total_list.sort()
-    random.seed(8)
+    random.seed(rand_seed)
     random.shuffle(total_list)
     if k is None:
         return total_list 
@@ -61,57 +62,112 @@ def train_test_embedding(method, backbone, total_train_list, cls, device):
     elif method == 'byol':
         embedding_net = Byol(backbone, 224, return_embedding=True)
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../checkpoint/byol/byol_SGD-cosine_None_256_0.05_1e-06_0.99_100_0.09318.pth')
+        if backbone == 'resnet18':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/byol/old/byol_SGD-cosine_None_43_0.05_1e-06_0.99_91_0.07909.pth')
+            #pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/byol/old/byol_SGD-cosine_None_43_0.05_1e-06_0.99_91_0.07909.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/byol/byol_SGD-cosine_None_43_0.05_1e-06_0.99_94_0.07873.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
         embedding_net.load_state_dict(state_dict)
     elif method == 'simsiam':
         embedding_net = Simsiam(backbone, 224, return_embedding=True)
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../checkpoint/simsiam/simsiam_SGD-cosine_None_256_0.05_1e-06_0.99_100_0.10016.pth')
+        if backbone == 'resnet18':
+            #pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/simsiam/simsiam_SGD-cosine_None_43_0.05_1e-06_0.99_43_0.09521.pth')
+            #pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/simsiam/simsiam_SGD-cosine_None_86_0.05_1e-06_0.99_7_0.09140.pth')
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/simsiam/old/simsiam_SGD-cosine_None_43_0.05_1e-06_0.99_97_0.09497.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/simsiam/simsiam_SGD-cosine_None_43_0.05_1e-06_0.99_84_0.07782.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
         embedding_net.load_state_dict(state_dict)
     elif method == 'cs':
-        embedding_net = Cs_co(backbone, 1, return_embedding=True) 
+        embedding_net = Cs_co(backbone, 1, half_channel=False, return_embedding=True) 
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../../generative_or_discriminative/model/recon_pretrain/0_ckpt0.04339.pth')
+        if backbone == 'resnet18':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/csco/cs/0_ckpt0.04339.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/csco/cs/csco_cs_Adam-step_None_32_0.001_0.0_1.0_45_0.04201.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
+        print(len(state_dict))
         embedding_net.load_state_dict(state_dict)
+
+    """  for cs-co, please use the script in ../ablation/
     elif method == 'cs-co':
-        embedding_net = Cs_co(backbone, 1, return_embedding=True) 
+        embedding_net = Cs_co(backbone, 1, half_channel=False, return_embedding=True) 
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../datasize_co/checkpoint/all/csco_co_Adam-step_None_96_0.001_1e-06_1.0_9_0.07061.pth')
-        #pretrain_dict = torch.load('../datasize_co/checkpoint/10000/csco_co_Adam-step_10000_96_0.001_1e-06_1.0_21_0.07079.pth')
-        #pretrain_dict = torch.load('../checkpoint/csco/csco_co_Adam-step_10000_96_0.001_1e-06_1.0_100_0.06461.pth')
-        #pretrain_dict = torch.load('../../generative_or_discriminative/model/fix_decoder_hp/recon_NODE_b+r_Adam-step_10000_0.001_1e-06_1_l2.pth')
+        if backbone == 'resnet18':
+            #pretrain_dict = torch.load('/home/yangpengshuai/old_3090_home/yps_miccai2021/datasize_co/checkpoint/10000/csco_co_Adam-step_10000_96_0.001_1e-06_1.0_21_0.07079.pth')
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/csco/co/csco_cs-co_Adam-step_10000_32_0.001_1e-06_1.0_40_0.06224.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/csco/co/csco_cs-co_Adam-step_10000_12_0.001_1e-06_1.0_98_0.09903.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
         embedding_net.load_state_dict(state_dict)
+    """
+
     elif method == 'chen-mia':
         embedding_net = Chen_mia(backbone, 3, return_embedding=True)
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../checkpoint/chen/chen_mia_Adam-step_None_64_0.001_1e-08_100_0.00308.pth')
+        if backbone == 'resnet18':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/chen/chen_mia_Adam-step_None_64_0.001_1e-08_92_0.00321.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/chen/chen_mia_Adam-step_None_64_0.001_1e-08_1_0.01474.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
         embedding_net.load_state_dict(state_dict)
     elif method == 'xie-miccai':
         embedding_net = Xie_miccai(backbone, 3, return_embedding=True)
         embedding_state_dict = embedding_net.state_dict()
-        pretrain_dict = torch.load('../checkpoint/xie/xie_miccai_SGD-step_None_64_0.001_1e-08_100_1.16703.pth')
+        if backbone == 'resnet18':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet18/xie/xie_miccai_SGD-step_None_64_0.001_1e-08_5_0.88814.pth')
+        elif backbone == 'resnet50':
+            pretrain_dict = torch.load('../checkpoint/NCT_CRC/resnet50/xie/xie_miccai_SGD-step_None_64_0.001_1e-08_2_1.20378.pth')
         state_dict = {k:v for k,v in pretrain_dict.items() if
                       k in embedding_state_dict}
         embedding_net.load_state_dict(state_dict)
 
+    elif method == 'simclr-ciga':
+        assert backbone == 'resnet18', 'simclr-ciga only has resnet18 ckpt!'
+        embedding_net = timm.create_model('resnet18', pretrained=False, num_classes=0)
+        embedding_state_dict = embedding_net.state_dict()
+        pretrain_dict = torch.load('./pytorchnative_ckpt_epoch_9.ckpt')['state_dict']
+        state_dict = {k[13:]:v for k,v in pretrain_dict.items() if k[13:] in
+                      embedding_state_dict}
+        print('param matched: {} / {}'.format(len(state_dict),
+                                              len(embedding_state_dict)))
+        embedding_net.load_state_dict(state_dict)
 
+    elif method == 'transpath':
+        assert backbone == 'resnet50', 'transpath only has resnet50 ckpt!'
+        embedding_net = ResNetV2(block_units=(3,4,9), width_factor=1)
+        embedding_state_dict = embedding_net.state_dict()
+        pretrain_dict = torch.load('./checkpoint_transpath.pth')
+        state_dict = {}
+        for k,v in pretrain_dict.items():
+            if k[:21] == 'module.online_encoder' and k[62:] in embedding_state_dict:
+                state_dict[k[62:]] = v
+        print('param matched: {} / {}'.format(len(state_dict),
+                                              len(embedding_state_dict)))
+        embedding_net.load_state_dict(state_dict)
+
+
+        
 
     embedding_net = embedding_net.to(device)
-
     
-    single_channel = False if method not in ['cs', 'cs-co'] else True 
-    train_dataset = get_testing_set(TRAIN_DATA, cls, single_channel, total_train_list)
-    test_dataset = get_testing_set(TEST_DATA, cls, single_channel)
+    #single_channel = False if method not in ['cs', 'cs-co'] else True 
+    single_channel = False if method not in ['cs'] else True 
+    if method in ['simclr-ciga', 'transpath']:     #### add normalization
+        train_dataset = get_testing_set(TRAIN_DATA, cls, single_channel,
+                                        total_train_list, method=method)
+        test_dataset = get_testing_set(TEST_DATA, cls, single_channel,
+                                       method=method)
+    else:
+        train_dataset = get_testing_set(TRAIN_DATA, cls, single_channel, total_train_list)
+        test_dataset = get_testing_set(TEST_DATA, cls, single_channel)
 
     train_loader = DataLoader(train_dataset, batch_size=32,                 #128
                               shuffle=False, drop_last=False, num_workers=4)
@@ -264,9 +320,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='script for linear evaluation.')
     parser.add_argument('-m', '--method', dest='method', type=str,
                         choices=['resnet-random', 'resnet-pretrained', 'byol',
-                                 'simsiam', 'cs', 'cs-co', 'chen-mia', 'xie-miccai'], help='embedding method')
+                                 'simsiam', 'cs', 
+                                 #'cs-co', 
+                                 'chen-mia', 'xie-miccai', 'simclr-ciga', 'transpath'], help='embedding method')
     parser.add_argument('-b', '--backbone', dest='backbone', type=str,
-                        default='resnet18', choices=['resnet18', 'resnet50'], 
+                        default='resnet50', choices=['resnet18', 'resnet50'], 
                         help='backbone')
     parser.add_argument('-d', '--datasize', dest='train_data_size', type=int,
                         default=1000, help='train data size')
@@ -279,27 +337,33 @@ if __name__ == '__main__':
     epochs = 500
     lr = 0.001
     train_data_size = args.train_data_size
-    num_fold = 5
+    num_run = 10
+    ratio = 0.8
 
     # classes and index
     #cls = {'NOR': 0, 'BEN': 1, 'INS': 2, 'INV': 3}
     cls = {'ADI':0, 'DEB':1, 'LYM':2, 'MUC':3, 'MUS':4, 'NORM':5, 'STR':6, 'TUM':7}
     print(cls)
     
-    total_train_list = np.array(get_img_list(TRAIN_DATA+'patches/',
-                                             k=train_data_size))
-    train_data_info(total_train_list)
-
-    # compute data embeddings  
-    train_embedding, train_label, test_embedding, test_label = train_test_embedding(args.method, args.backbone, total_train_list, cls, device)    
-    embed_dim = train_embedding.shape[1]
-
+    
     # linear classifier and cross-validation
-    kf = KFold(n_splits=num_fold)
     results = []
     e_losses = []
     stop_epochs = []
-    for i, (train_index, valid_index) in enumerate(kf.split(total_train_list)):
+    for i in range(num_run):
+        total_train_list = np.array(get_img_list(TRAIN_DATA+'patches/',
+                                                 k=train_data_size, rand_seed=i))
+        print(total_train_list[:5])
+        train_data_info(total_train_list)
+
+        # compute data embeddings  
+        train_embedding, train_label, test_embedding, test_label = train_test_embedding(args.method, args.backbone, total_train_list, cls, device)    
+        embed_dim = train_embedding.shape[1]
+
+        total_index = [i for i in range(len(total_train_list))]
+        train_index = total_index[:int(ratio*len(total_index))]
+        valid_index = total_index[int(ratio*len(total_index)):]
+
         model = Linear(embed_dim, len(cls))
         model = model.to(device)
         optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
@@ -323,7 +387,6 @@ if __name__ == '__main__':
         ckpt_path = './model/{}_'.format(args.method)+str(i)+'.pth'
         early_stopping = EarlyStopping(patience=15, verbose=True, delta=0.001,
                                        path=ckpt_path) 
-    
         
         for epoch in range(1, epochs+1):
             train_epoch(train_loader, model, optimizer, loss_fn, device, epoch) 
@@ -346,13 +409,13 @@ if __name__ == '__main__':
     print('acc: ',results)
     print('loss: ',e_losses)
     print('stop_epochs: ', stop_epochs)
-    print('5-fold test_acc, mean: {:.6f}, std: {:.6f}\n'.format(results.mean(),
-                                                                results.std()))
+    print('{}-time run test_acc, mean: {:.6f}, std: {:.6f}\n'.format(num_run, results.mean(),
+                                                                     results.std()))
 
     f = open('Comparison.txt', 'a')
-    f.write('method: {}, train_data_size: {}\n'.format(args.method,
-                                                       args.train_data_size))
+    f.write('backbone: {}, method: {}, train_data_size: {}\n'.format(args.backbone, args.method,
+                                                                     args.train_data_size))
+    f.write('{}\n'.format(results))
     f.write('test_acc, mean: {:.6f}, std: {:.6f}\n\n'.format(results.mean(),
-                                                                results.std()))
+                                                             results.std()))
     f.close()
-

@@ -1,25 +1,59 @@
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 100
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 1000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-random -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m resnet-pretrained -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m byol -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m simsiam -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m chen-mia -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m xie-miccai -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs -d 10000
-CUDA_VISIBLE_DEVICES=1 python3 linear_train.py -m cs-co -d 10000
+#python3 -u linear_train.py -m resnet-random -b resnet18 -d 100
+#python3 -u linear_train.py -m resnet-random -b resnet18 -d 1000
+#python3 -u linear_train.py -m resnet-random -b resnet18 -d 10000
+#python3 -u linear_train.py -m resnet-pretrained -b resnet18 -d 100
+#python3 -u linear_train.py -m resnet-pretrained -b resnet18 -d 1000
+#python3 -u linear_train.py -m resnet-pretrained -b resnet18 -d 10000
+
+#python3 -u linear_train.py -m chen-mia -b resnet18 -d 100
+#python3 -u linear_train.py -m chen-mia -b resnet18 -d 1000
+#python3 -u linear_train.py -m chen-mia -b resnet18 -d 10000
+#python3 -u linear_train.py -m xie-miccai -b resnet18 -d 100
+#python3 -u linear_train.py -m xie-miccai -b resnet18 -d 1000
+#python3 -u linear_train.py -m xie-miccai -b resnet18 -d 10000
+
+#python3 -u linear_train.py -m byol -b resnet18 -d 100
+#python3 -u linear_train.py -m byol -b resnet18 -d 1000
+#python3 -u linear_train.py -m byol -b resnet18 -d 10000
+#python3 -u linear_train.py -m simsiam -b resnet18 -d 100
+#python3 -u linear_train.py -m simsiam -b resnet18 -d 1000
+#python3 -u linear_train.py -m simsiam -b resnet18 -d 10000
+
+#python3 -u linear_train.py -m cs -b resnet18 -d 100
+#python3 -u linear_train.py -m cs -b resnet18 -d 1000
+#python3 -u linear_train.py -m cs -b resnet18 -d 10000
+
+python3 -u linear_train.py -m simclr-ciga -b resnet18 -d 100
+python3 -u linear_train.py -m simclr-ciga -b resnet18 -d 1000
+python3 -u linear_train.py -m simclr-ciga -b resnet18 -d 10000
+
+#python3 -u linear_train.py -m resnet-random -b resnet50 -d 100
+#python3 -u linear_train.py -m resnet-random -b resnet50 -d 1000
+#python3 -u linear_train.py -m resnet-random -b resnet50 -d 10000
+#python3 -u linear_train.py -m resnet-pretrained -b resnet50 -d 100
+#python3 -u linear_train.py -m resnet-pretrained -b resnet50 -d 1000
+#python3 -u linear_train.py -m resnet-pretrained -b resnet50 -d 10000
+
+#python3 -u linear_train.py -m chen-mia -b resnet50 -d 100
+#python3 -u linear_train.py -m chen-mia -b resnet50 -d 1000
+#python3 -u linear_train.py -m chen-mia -b resnet50 -d 10000
+#python3 -u linear_train.py -m xie-miccai -b resnet50 -d 100
+#python3 -u linear_train.py -m xie-miccai -b resnet50 -d 1000
+#python3 -u linear_train.py -m xie-miccai -b resnet50 -d 10000
+
+#python3 -u linear_train.py -m byol -b resnet50 -d 100
+#python3 -u linear_train.py -m byol -b resnet50 -d 1000
+#python3 -u linear_train.py -m byol -b resnet50 -d 10000
+#python3 -u linear_train.py -m simsiam -b resnet50 -d 100
+#python3 -u linear_train.py -m simsiam -b resnet50 -d 1000
+#python3 -u linear_train.py -m simsiam -b resnet50 -d 10000
+
+#python3 -u linear_train.py -m cs -b resnet50 -d 100
+#python3 -u linear_train.py -m cs -b resnet50 -d 1000
+#python3 -u linear_train.py -m cs -b resnet50 -d 10000
+
+python3 -u linear_train.py -m transpath -b resnet50 -d 100
+python3 -u linear_train.py -m transpath -b resnet50 -d 1000
+python3 -u linear_train.py -m transpath -b resnet50 -d 10000
+
 

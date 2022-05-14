@@ -39,7 +39,7 @@ def get_validating_set(valid_dir, cls, single_channel, valid_list=None):
     return DatasetFromFolder(valid_dir, img_list, cls, single_channel)
 
 
-def get_testing_set(test_dir, cls, single_channel, test_list=None):
+def get_testing_set(test_dir, cls, single_channel, test_list=None, method=None):
     if test_list is None:
         patches_dir = test_dir + 'patches/'
 
@@ -48,16 +48,26 @@ def get_testing_set(test_dir, cls, single_channel, test_list=None):
         img_list.sort()
     else:
         img_list = test_list
-    return DatasetFromFolder(test_dir, img_list, cls, single_channel)
+    return DatasetFromFolder(test_dir, img_list, cls, single_channel, method)
 
 
 class DatasetFromFolder(Dataset):
-    def __init__(self, data_dir, img_list, cls, single_channel):
+    def __init__(self, data_dir, img_list, cls, single_channel, method):
         super(DatasetFromFolder, self).__init__()
         self.data_dir = data_dir
         self.img_list = img_list
         self.cls = cls
         self.single_channel = single_channel
+        self.method = method 
+        if method is not None:
+            if method == 'simclr-ciga':
+                self.mean = (0.5, 0.5, 0.5)
+                self.std = (0.5, 0.5, 0.5)
+            elif method in ['transpath', 'retccl']:
+                self.mean = (0.485, 0.456, 0.406) 
+                self.std = (0.229, 0.224, 0.225)
+            print('mean: ', self.mean)
+            print('std: ', self.std)
 
     def __getitem__(self, index):
         label = self.img_list[index].split('-')[0]
@@ -74,7 +84,12 @@ class DatasetFromFolder(Dataset):
 
         else:
             patch = Image.open(os.path.join(self.data_dir+'patches/', self.img_list[index]))
-            transform = transforms.ToTensor()
+            if self.method is not None:
+                transform = transforms.Compose([transforms.ToTensor(),
+                                                transforms.Normalize(mean=self.mean,
+                                                                     std=self.std)])
+            else:
+                transform = transforms.ToTensor()
             patch = transform(patch)
             return patch, label
 

@@ -8,6 +8,7 @@
 #   train the fully supervised resnet 
 # ******************************************************
 import os 
+import sys
 import numpy as np
 import random
 import argparse
@@ -27,15 +28,10 @@ from tqdm import tqdm
 from utils import EarlyStopping
 from dataset import get_training_set, get_validating_set, get_testing_set
 
-import sys
-sys.path.append('..')
-from model import Linear, Simsiam, Byol, Cs_co 
+os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
 
-
-#TRAIN_DATA = '../BioImage_2015_data/dataset/train/'
-#TEST_DATA = '../BioImage_2015_data/dataset/init_test/'
-TRAIN_DATA = '../../NCT_CRC_data/all_data/train/'
-TEST_DATA = '../../NCT_CRC_data/all_data/test/'
+TRAIN_DATA = '/data/user/yangpengshuai/MedIA_SI_datasets/NCT_CRC/train/'
+TEST_DATA = '/data/user/yangpengshuai/MedIA_SI_datasets/NCT_CRC/test/'
 
 def get_img_list(path, k=None):
     total_list = os.listdir(path)
@@ -100,9 +96,9 @@ def train_epoch(train_loader, model, optimizer, loss_fn, device, epoch):
 
 def eval_epoch(eval_loader, model, loss_fn, device, epoch, eval_type,
                early_stopping=None):
+    model.eval()
+    val_loss = []
     with torch.no_grad():
-        model.eval()
-        val_loss = []
         p_bar = tqdm(eval_loader)
         for batch_idx, (patches, y) in enumerate(p_bar):
             patches = patches.to(device)
@@ -145,7 +141,10 @@ if __name__ == '__main__':
     epochs = 500
     lr = 0.001
     train_data_size = None
-    num_fold = 5
+    num_run = 10
+    ratio = 0.8
+
+    backbone = sys.argv[1]
 
     # classes and index
     #cls = {'NOR': 0, 'BEN': 1, 'INS': 2, 'INV': 3}
@@ -156,14 +155,19 @@ if __name__ == '__main__':
                                              k=train_data_size))
     train_data_info(total_train_list)
 
-
-    # linear classifier and cross-validation
-    kf = KFold(n_splits=num_fold)
     results = []
     e_losses = []
     stop_epochs = []
-    for i, (train_index, valid_index) in enumerate(kf.split(total_train_list)):
-        model = models.resnet18(num_classes=len(cls)) 
+
+    for i in range(num_run):
+        total_index = [j for j in range(len(total_train_list))]
+        random.shuffle(total_index)
+        train_index = total_index[:int(ratio*len(total_train_list))]
+        valid_index = total_index[int(ratio*len(total_train_list)):]
+        if backbone == 'resnet18':
+            model = models.resnet18(num_classes=len(cls)) 
+        elif backbone == 'resnet50':
+            model = models.resnet50(num_classes=len(cls)) 
         model = model.to(device)
         optimizer = optim.SGD(model.parameters(), lr=lr, momentum=0.9)
         #optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -183,7 +187,7 @@ if __name__ == '__main__':
 
         loss_fn = nn.CrossEntropyLoss()
         scheduler = ReduceLROnPlateau(optimizer, 'min', verbose=True)
-        ckpt_path = './checkpoint/resnet18_'+str(i)+'.pth'
+        ckpt_path = './checkpoint/{}_'.format(backbone)+str(i)+'.pth'
         early_stopping = EarlyStopping(patience=15, verbose=True, delta=0.001,
                                        path=ckpt_path) 
     
@@ -209,11 +213,11 @@ if __name__ == '__main__':
     print('acc: ',results)
     print('loss: ',e_losses)
     print('stop_epochs: ', stop_epochs)
-    print('5-fold test_acc, mean: {:.6f}, std: {:.6f}\n'.format(results.mean(),
-                                                                results.std()))
+    print('{}-time run test_acc, mean: {:.6f}, std: {:.6f}\n'.format(num_run, results.mean(),
+                                                                     results.std()))
     
     f = open('FullySupResult.txt', 'a')
-    f.write('acc: {}\n'.format(results))
+    f.write('{}, acc: {}\n'.format(backbone, results))
     f.write('test_acc, mean:{:.6f}, std: {:.6f}\n\n'.format(results.mean(),
                                                            results.std()))
     f.close()

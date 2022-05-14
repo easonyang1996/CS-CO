@@ -12,15 +12,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .resnet import resnet18, resnet34, resnet50, resnet101, resnet152
+from .resnet import resnet18, resnet50
 from .model_parts import Up, OutConv
 import numpy as np
 import copy
 from functools import wraps
 
-BACKBONE = {'resnet18': resnet18, 'resnet34': resnet34, 
-            'resnet50': resnet50, 'resnet101': resnet101, 
-            'resnet152': resnet152}
+BACKBONE = {'resnet18': resnet18, 'resnet50': resnet50}
 
 # helper functions
 
@@ -70,12 +68,10 @@ def update_moving_average(ema_updater, ma_model, current_model):
 ###################################### sub module ###################################
 
 class Encoder(nn.Module):
-    def __init__(self, encoder_name, pretrained=False, half_channel=False,
-                 in_channel=3):
+    def __init__(self, encoder_name, half_channel=False, in_channel=1):
         super(Encoder, self).__init__()
-        self.backbone = BACKBONE[encoder_name](pretrained=pretrained,
-                                                half_channel=half_channel,
-                                                in_channel=in_channel)
+        self.backbone = BACKBONE[encoder_name](half_channel=half_channel,
+                                               in_channel=in_channel)
 
     def forward(self, x):
         x = self.backbone(x)
@@ -86,7 +82,7 @@ class Decoder(nn.Module):
     def __init__(self, encoder_name, out_channel, half_channel=False,
                  bilinear=True, decoder_freeze=False):
         super(Decoder, self).__init__()
-        if encoder_name[-2:] in ['18', '34']:   
+        if encoder_name[-2:] =='18':   
             decoder_channel = np.array([512, 256, 128, 64, 64])
         else:
             decoder_channel = np.array([2048, 1024, 512, 256, 64]) 
@@ -115,13 +111,13 @@ class Decoder(nn.Module):
 
 
 class HE_Encoder(nn.Module):
-    def __init__(self, encoder_name, in_channel, pretrained=False,
+    def __init__(self, encoder_name, in_channel, 
                  half_channel=False):
         super(HE_Encoder, self).__init__()
-        self.H2E_encoder = Encoder(encoder_name, pretrained=pretrained,
+        self.H2E_encoder = Encoder(encoder_name, 
                                    half_channel=half_channel,
                                    in_channel=in_channel)
-        self.E2H_encoder = Encoder(encoder_name, pretrained=pretrained,
+        self.E2H_encoder = Encoder(encoder_name, 
                                    half_channel=half_channel,
                                    in_channel=in_channel)
 
@@ -169,7 +165,7 @@ class MLP(nn.Module):
 class CS_CO(nn.Module):
     def __init__(self, encoder_name, in_channel, projection_size=256,
                  model_type='cs', bilinear=True, half_channel=False,
-                 decoder_freeze=False, pretrained=False, 
+                 decoder_freeze=False, 
                  pretrained_recon=None, moving_average_decay=0.99, 
                  use_momentum=True, return_embedding=False):
         super(CS_CO, self).__init__()
@@ -178,8 +174,8 @@ class CS_CO(nn.Module):
         self.use_momentum = use_momentum
         self.return_embedding = return_embedding
         
-        self.online_he_encoder = HE_Encoder(encoder_name, in_channel, pretrained,
-                                         half_channel) 
+        self.online_he_encoder = HE_Encoder(encoder_name, in_channel,
+                                            half_channel) 
         self.avgpool = nn.AdaptiveAvgPool2d((1,1))
 
         if not return_embedding:
@@ -191,7 +187,7 @@ class CS_CO(nn.Module):
                 self._load_decoder_weight(pretrained_recon)
 
             if model_type == 'cs-co':
-                mlp_dim = 1024 if encoder_name[-2:] in ['18', '34'] else 2048
+                mlp_dim = 1024 if encoder_name[-2:] in ['18'] else 4096
                 mlp_dim = mlp_dim//2 if half_channel else mlp_dim
                 
                 self.online_projector = MLP(dim=mlp_dim,
@@ -215,14 +211,16 @@ class CS_CO(nn.Module):
 
     def _load_encoder_weight(self, weight_path):
         # load encoder weight
-        pretrained_dict = torch.load(weight_path)
+        pretrained_dict = torch.load(weight_path,
+                                     map_location=torch.device('cpu'))
         pretrained_dict = {k[18:]:v for k,v in pretrained_dict.items() if
                            k[:18]=='online_he_encoder.'}
         self.online_he_encoder.load_state_dict(pretrained_dict)
 
     def _load_decoder_weight(self, weight_path):
         # load decoder weight
-        pretrained_dict = torch.load(weight_path)
+        pretrained_dict = torch.load(weight_path,
+                                     map_location=torch.device('cpu'))
         pretrained_dict = {k[11:]:v for k,v in pretrained_dict.items() if
                            k[:11]=='he_decoder.'}
         self.he_decoder.load_state_dict(pretrained_dict)
@@ -322,11 +320,13 @@ class CS_CO(nn.Module):
             return online_pred_one, online_pred_two, target_proj_one, target_proj_two, pred_one_e, pred_one_h
 
 
-def Cs_co(network, in_channel, model_type='cs', decoder_freeze=False, 
+def Cs_co(network, in_channel, model_type='cs', half_channel=True, 
+          decoder_freeze=False, 
           pretrained_recon=None, moving_average_decay=0.99, 
           use_momentum=True, return_embedding=False):
     return CS_CO(encoder_name=network, in_channel=in_channel,
-                 model_type=model_type, decoder_freeze=decoder_freeze,
+                 model_type=model_type, half_channel=half_channel,
+                 decoder_freeze=decoder_freeze,
                  pretrained_recon=pretrained_recon,
                  moving_average_decay=moving_average_decay,
                  use_momentum=use_momentum, return_embedding=return_embedding)

@@ -27,6 +27,7 @@ from utils import EarlyStopping
 sys.path.append('..')
 from model import Xie_miccai
 
+os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
 
 class Triplet_Loss(nn.Module):
     def __init__(self, m1=1.0):
@@ -208,11 +209,9 @@ if __name__ == '__main__':
             scheduler.step(eval_loss)  
         if optim_name.split('-')[-1] == 'cosine':
             scheduler.step()  
-        ''' 
         if early_stopping.early_stop:
             print('Early stop!')
             break
-        '''
     
 
 

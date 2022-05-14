@@ -42,34 +42,37 @@ class EarlyStopping:
         self.delta = delta
         self.path = path
 
-    def __call__(self, val_loss, model):
+    def __call__(self, val_loss, model, epoch=None, ddp=False):
 
         score = -val_loss
 
         if self.best_score is None:
             self.best_score = score
-            self.save_checkpoint(val_loss, model)
+            self.save_checkpoint(val_loss, model, epoch, ddp)
         elif score < self.best_score + self.delta:
             self.counter += 1
-            if self.verbose:
-                print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+            print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+            ################
+            #self.save_checkpoint(val_loss, model, epoch)
+            ################
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
             self.best_score = score
-            self.save_checkpoint(val_loss, model)
+            self.save_checkpoint(val_loss, model, epoch, ddp)
             self.counter = 0
 
-    def save_checkpoint(self, val_loss, model):
+    def save_checkpoint(self, val_loss, model, epoch, ddp):
         '''Saves model when validation loss decrease.'''
         if self.verbose:
             print(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
-        #weight_path = self.path[:-4]+'_'+str(epoch)+'_'+str(val_loss)[:7]+'.pth'
-        weight_path = self.path
-        if torch.cuda.device_count() > 1:
+        if epoch != None:
+            weight_path = self.path[:-4]+'_'+str(epoch)+'_'+str(val_loss)[:7]+'.pth'
+        else:
+            weight_path = self.path
+        if torch.cuda.device_count() > 1 or ddp==True:
             torch.save(model.module.state_dict(), weight_path)
         else:
-            #pass
             torch.save(model.state_dict(), weight_path)
         self.val_loss_min = val_loss
 

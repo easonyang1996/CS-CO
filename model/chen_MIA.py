@@ -14,16 +14,15 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from .resnet import resnet18, resnet34, resnet50, resnet101, resnet152
+from .resnet import resnet18, resnet50
 import numpy as np
 
-BACKBONE = {'resnet18': resnet18, 'resnet34': resnet34, 'resnet50': resnet50,
-            'resnet101': resnet101, 'resnet152': resnet152}
+BACKBONE = {'resnet18': resnet18, 'resnet50': resnet50}
 
 class Encoder(nn.Module):
     def __init__(self, encoder_name, pretrained=False, in_channel=3):
         super(Encoder, self).__init__()
-        self.backbone = BACKBONE[encoder_name](pretrained=pretrained,
+        self.backbone = BACKBONE[encoder_name](half_channel=False,
                                                in_channel=in_channel)
 
     def forward(self, x):

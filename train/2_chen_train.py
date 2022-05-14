@@ -27,6 +27,7 @@ from utils import EarlyStopping
 sys.path.append('..')
 from model import Chen_mia 
 
+os.environ["CUDA_DEVICE_ORDER"] = 'PCI_BUS_ID'
 
 def train_epoch(train_loader, model, loss_fn, optimizer, device, epoch):
     model.train()
@@ -171,11 +172,9 @@ if __name__ == '__main__':
             scheduler.step(eval_loss)  
         if optim_name.split('-')[-1] == 'cosine':
             scheduler.step()  
-        ''' 
         if early_stopping.early_stop:
             print('Early stop!')
             break
-        '''
     
 
 
