@@ -48,7 +48,9 @@ At the second stage, contrastive learning can be done by running:
 CUDA_VISIBLE_DEVICES=0,1,2 python3 -u 4_csco_train_dist.py configs/NCT_CRC/cs-co_conf_resnet18.ini 3
 ```
 
-You can also reproduce competing methods by running `run_byol_simsiam.sh` or `run_chen_xie.sh`. The configurations of all methods are saved in `./train/config/`, and you can modify them as you wish.
+You can also reproduce competing methods by running `run_byol_simsiam.sh` or `run_chen_xie.sh`. 
+
+The configurations of all methods are saved in `./train/config/`, and you can modify them as you wish.
 
 
 **3. Evaluation**
@@ -61,7 +63,18 @@ For evaluation, we run 10 times Monte Carlo cross-validation under the linear ev
 
 The model weights of Transpath and SimCLR-ciga can be found from [Xiyue-Wang/TransPath](https://github.com/Xiyue-Wang/TransPath) and [ozanciga/self-supervised-histopathology](https://github.com/ozanciga/self-supervised-histopathology) respectively.
 
+**4. Ablation**
 
+The code of our ablation study can be found in `./ablation/`. You can reproduce ablated models by running:
+
+```
+./run_co.sh
+```
+
+and evaluate them by running:
+```
+./eval.sh
+```
 
 
 # Citation
