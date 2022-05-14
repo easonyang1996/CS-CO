@@ -79,6 +79,8 @@ and evaluate them by running:
 
 # Citation
 
+Please use below to cite this paper if you find our work useful in your research.
+
 **Yang, P.**, Hong, Z., Yin, X., Zhu, C., Jiang, R. (2021). Self-supervised Visual Representation Learning for Histopathological Images. In: , et al. Medical Image Computing and Computer Assisted Intervention – MICCAI 2021. MICCAI 2021. Lecture Notes in Computer Science(), vol 12902. Springer, Cham. https://doi.org/10.1007/978-3-030-87196-3_5
 
 
