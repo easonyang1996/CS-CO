@@ -10,7 +10,7 @@ We provide detailed step-by-step instructions for reproducing experiments of the
 
 **1. Prepare the dataset**
 
-Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). In our paper, NCT-CRC-HE-100K.zip is used as the training set and CRC-VAL-HE-7K.zip is used as the test set. For each set, we exclude images belonging to "BACK" class and move the rest images to one folder. 
+Please download the dataset from [NCT-CRC-HE-100K](https://zenodo.org/record/1214456#.Yn9lVy8RrfY). In our paper, `NCT-CRC-HE-100K.zip` is used as the training set and `CRC-VAL-HE-7K.zip` is used as the test set. For each set, we exclude images belonging to "BACK" class and move the rest images to one folder. 
 
 ```
 ____NCT-CRC
@@ -34,7 +34,7 @@ python3 H_H_prime_generate.py
 
 **2. Training**
 
-The training of the proposed CS-CO contains two stages. Please go to `./train/`
+The training of the proposed CS-CO contains two stages. Please go to `./train/`.
 
 At the first stage, cross-stain prediction can be done by running:
 
@@ -61,7 +61,7 @@ For evaluation, we run 10 times Monte Carlo cross-validation under the linear ev
 ./eval.sh
 ```
 
-The model weights of Transpath and SimCLR-ciga can be found from [Xiyue-Wang/TransPath](https://github.com/Xiyue-Wang/TransPath) and [ozanciga/self-supervised-histopathology](https://github.com/ozanciga/self-supervised-histopathology) respectively.
+The model weights of Transpath and SimCLR-ciga can be found from [Xiyue-Wang/TransPath](https://github.com/Xiyue-Wang/TransPath) and [ozanciga/self-supervised-histopathology](https://github.com/ozanciga/self-supervised-histopathology) respectively. Please download and put them in `./linear_eval/` if you want to test the performance of Transpath and SimCLR-ciga.
 
 **4. Ablation**
 
