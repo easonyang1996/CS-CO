@@ -3,7 +3,7 @@ CS-CO is a hybrid self-supervised visual representation learning method tailored
 
 MICCAI2021 Paper: [Self-supervised visual representation learning for histopathological images](https://link.springer.com/chapter/10.1007/978-3-030-87196-3_5)
 
-![framework](https://github.com/easonyang1996/CS-CO/tree/main/figs/framework.jpeg)
+![framework](https://github.com/easonyang1996/CS-CO/tree/main/figs/framework.png)
 
 # Instructions
 We provide detailed step-by-step instructions for reproducing experiments of the proposed method on NCT-CRC-HE-100K. You can also run the proposed method on your own dataset in a similar way.
