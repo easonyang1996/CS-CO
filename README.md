@@ -100,3 +100,15 @@ pages="47--57",
 isbn="978-3-030-87196-3"
 }
 ```
+```
+@article{YANG2022102539,
+title = {CS-CO: A Hybrid Self-Supervised Visual Representation Learning Method for H&E-stained Histopathological Images},
+journal = {Medical Image Analysis},
+pages = {102539},
+year = {2022},
+issn = {1361-8415},
+doi = {https://doi.org/10.1016/j.media.2022.102539},
+url = {https://www.sciencedirect.com/science/article/pii/S1361841522001864},
+author = {Pengshuai Yang and Xiaoxu Yin and Haiming Lu and Zhongliang Hu and Xuegong Zhang and Rui Jiang and Hairong Lv},
+}
+```
