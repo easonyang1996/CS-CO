@@ -2,6 +2,7 @@
 CS-CO is a hybrid self-supervised visual representation learning method tailored for H&E-stained histopathological images. This work has been presented in MICCAI2021 conference as an oral talk. An extended version of the MICCAI2021 paper has been accepted by Medical Image Analysis.
 
 MICCAI2021 Paper: [Self-supervised visual representation learning for histopathological images](https://link.springer.com/chapter/10.1007/978-3-030-87196-3_5)
+
 MedIA Paper: [CS-CO: A Hybrid Self-Supervised Visual Representation Learning Method for H&E-stained Histopathological Images](https://www.sciencedirect.com/science/article/pii/S1361841522001864)
 
 ![framework](https://github.com/easonyang1996/CS-CO/blob/main/figs/framework.png)
